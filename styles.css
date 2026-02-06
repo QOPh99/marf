@@ -1,0 +1,95 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #000 url('waterfall.jpg') center / cover no-repeat fixed;
+  touch-action: manipulation;
+}
+
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.wheel {
+  position: absolute;
+  inset: 720px 50%;
+  margin: auto;
+  width: 70vmin;
+  height: 300vmin;
+  max-width: 420px;
+  max-height: 550px;
+  border: none;
+  border-radius: 16px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 8px 48px #000c;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.wheel.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wheel1 { background-image: url('waterfall.jpg'); }
+.wheel2 { background-image: url('coca.jpg'); }
+.wheel3 { background-image: url('data.jpg'); }
+.wheel4 { background-image: url('girl.jpg'); }
+.wheel5 { background-image: url('lastmeal.jpg'); }
+.wheel6 { background-image: url('eleven.jpg'); }
+.wheel7 { background-image: url('waterfall.jpg'); }
+.wheel8 { background-image: url('girl.jpg'); }
+.wheel9 { background-image: url('coca.jpg'); }
+
+/* Counter-clockwise: out top-left, in from bottom-left */
+@keyframes fly-out-ccw {
+  to {
+    transform: translate(-140%, -140%) rotate(-42deg) scale(0.82);
+    opacity: 0;
+  }
+}
+
+@keyframes fly-in-ccw {
+  from {
+    transform: translate(-140%, 140%) rotate(42deg) scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Clockwise: out bottom-left, in from top-left */
+@keyframes fly-out-cw {
+  to {
+    transform: translate(-140%, 140%) rotate(42deg) scale(0.82);
+    opacity: 0;
+  }
+}
+
+@keyframes fly-in-cw {
+  from {
+    transform: translate(-140%, -140%) rotate(-42deg) scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.fly-out-ccw { animation: fly-out-ccw 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+.fly-in-ccw  { animation: fly-in-ccw  1.1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+.fly-out-cw  { animation: fly-out-cw  1.1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+.fly-in-cw   { animation: fly-in-cw   1.1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
