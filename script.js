@@ -6,11 +6,6 @@ let isAnimating = false;
 let isRotating = true;        // starts rotating automatically
 let isCCW = true;             // counter-clockwise default
 let startY = 0;
-let tapCount = 0;
-let tapTimer = null;
-
-const TAP_TIMEOUT = 320;      // ms for double-tap detection
-const FRAME_DURATION = 1100;  // 1.1s animation + buffer
 
 // Show first button
 wheels[0].classList.add('active');
@@ -22,7 +17,7 @@ function startRotation() {
   if (rotationTimer) return;
   isRotating = true;
   performRotation(); // immediate first step
-  rotationTimer = setInterval(performRotation, FRAME_DURATION);
+  rotationTimer = setInterval(performRotation, 0); // matches animation + tiny buffer
 }
 
 function stopRotation() {
@@ -66,7 +61,7 @@ function performRotation() {
   }, { once: true });
 }
 
-// Unified input handling (works on touch & mouse)
+// Unified input handling (mobile + desktop)
 stage.addEventListener('mousedown', e => {
   startY = e.clientY;
   e.preventDefault();
@@ -87,34 +82,26 @@ stage.addEventListener('touchend', e => {
   handleInput(deltaY);
 }, { passive: false });
 
-// Shared logic for both mouse & touch
+// Shared logic
 function handleInput(deltaY) {
-  if (Math.abs(deltaY) < 35) {
-    // Tap / click
+  if (Math.abs(deltaY) < 40) {
+    // Tap / click (small movement)
     if (isRotating) {
-      // First tap/click → pause only
+      // While rotating → first tap pauses
       stopRotation();
     } else {
-      // Already paused → count double-tap
-      tapCount++;
-      if (tapCount === 1) {
-        tapTimer = setTimeout(() => { tapCount = 0; }, TAP_TIMEOUT);
-      } else if (tapCount === 2) {
-        clearTimeout(tapTimer);
-        tapCount = 0;
-        // Double-tap/click → open photo
-        const photoUrl = wheels[currentIndex].dataset.photo;
-        window.location.href = photoUrl;
-      }
+      // Already paused → single tap opens URL
+      const photoUrl = wheels[currentIndex].dataset.photo;
+      window.location.href = photoUrl;
     }
   } else if (!isRotating) {
-    // Swipe while paused → resume
+    // Swipe while paused → resume in direction
     if (deltaY > 60) {
-      // Up → CCW
+      // Swipe up → CCW
       isCCW = true;
       startRotation();
     } else if (deltaY < -60) {
-      // Down → CW
+      // Swipe down → CW
       isCCW = false;
       startRotation();
     }
