@@ -1,10 +1,11 @@
 const stage = document.querySelector('.stage');
 const wheels = Array.from(document.querySelectorAll('.wheel'));
+const hint = document.getElementById('rotationHint');
 
 let currentIndex = 0;
 let isAnimating = false;
-let isRotating = true;        // starts rotating automatically
-let isCCW = true;             // counter-clockwise default
+let isRotating = true; // starts rotating automatically
+let isCCW = true;
 let startY = 0;
 
 // Show first button
@@ -17,7 +18,7 @@ function startRotation() {
   if (rotationTimer) return;
   isRotating = true;
   performRotation(); // immediate first step
-  rotationTimer = setInterval(performRotation, 0); // matches animation + tiny buffer
+  rotationTimer = setInterval(performRotation, 0);
 }
 
 function stopRotation() {
@@ -26,6 +27,16 @@ function stopRotation() {
     rotationTimer = null;
   }
   isRotating = false;
+
+  // Show "Paused" for 0.5 seconds
+  if (hint) {
+    hint.textContent = "Paused";
+    hint.classList.add('visible');
+    
+    setTimeout(() => {
+      hint.classList.remove('visible');
+    }, 1300);
+  }
 }
 
 function performRotation() {
@@ -61,17 +72,9 @@ function performRotation() {
   }, { once: true });
 }
 
-// Unified input handling (mobile + desktop)
-stage.addEventListener('mousedown', e => {
-  startY = e.clientY;
-  e.preventDefault();
-});
-
-stage.addEventListener('mouseup', e => {
-  const deltaY = startY - e.clientY;
-  handleInput(deltaY);
-});
-
+// ────────────────────────────────────────────────
+// Touch/mouse handling
+// ────────────────────────────────────────────────
 stage.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
   e.preventDefault();
@@ -82,31 +85,37 @@ stage.addEventListener('touchend', e => {
   handleInput(deltaY);
 }, { passive: false });
 
+stage.addEventListener('mousedown', e => {
+  startY = e.clientY;
+  e.preventDefault();
+});
+
+stage.addEventListener('mouseup', e => {
+  const deltaY = startY - e.clientY;
+  handleInput(deltaY);
+});
+
 // Shared logic
 function handleInput(deltaY) {
   if (Math.abs(deltaY) < 40) {
-    // Tap / click (small movement)
+    // Tap / click
     if (isRotating) {
-      // While rotating → first tap pauses
-      stopRotation();
+      stopRotation(); // shows "Paused" for 0.5s then hides
     } else {
-      // Already paused → single tap opens URL
       const photoUrl = wheels[currentIndex].dataset.photo;
       window.location.href = photoUrl;
     }
   } else if (!isRotating) {
-    // Swipe while paused → resume in direction
+    // Swipe while paused → resume
     if (deltaY > 60) {
-      // Swipe up → CCW
       isCCW = true;
       startRotation();
     } else if (deltaY < -60) {
-      // Swipe down → CW
       isCCW = false;
       startRotation();
     }
   }
 }
 
-// Start automatically
+// Start automatically – no hint at start
 startRotation();
